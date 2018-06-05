@@ -641,7 +641,8 @@ public class TableUtils
 				}
 			} else if (databaseName.equals("Oracle"))
 			{
-				if (message.contains("ORA-00955"))
+				if (message.contains("ORA-00955")
+						|| message.contains("ORA-01031"))
 				{
 					// table exists
 					return 0;
