@@ -620,32 +620,40 @@ public class TableUtils
 			return stmtC;
 		} catch (SQLException e)
 		{
-			Throwable cause = e.getCause();
-			String message = cause.getMessage();
-			String databaseName = databaseType.getDatabaseName();
+			if (ifNotExists)
+			{
+				Throwable cause = e.getCause();
+				String message = cause.getMessage();
+				String databaseName = databaseType.getDatabaseName();
 
-			// DB2 does not support if not exists
-			if (databaseName.equals("DB2"))
-			{
-				if (message.contains("SQLCODE=-601"))
+				// DB2 does not support if not exists
+				if (databaseName.equals("DB2"))
 				{
-					// table exists
-					return 0;
-				}
-			} else if (databaseName.equals("SQL Server"))
-			{
-				if (message.contains("There is already an object named"))
+					if (message.contains("SQLCODE=-601"))
+					{
+						// table exists
+						return 0;
+					}
+				} else if (databaseName.equals("SQL Server"))
 				{
-					// table exists
-					return 0;
-				}
-			} else if (databaseName.equals("Oracle"))
-			{
-				if (message.contains("ORA-00955")
-						|| message.contains("ORA-01031"))
+					SQLException mssqle = (SQLException) cause;
+					// System.out.println("SQL STATE: " + mssqle.getSQLState());
+					// System.out.println("ERROR CODE: " +
+					// mssqle.getErrorCode());
+					// System.out.println("MESSAGE: " + mssqle.getMessage());
+					if (mssqle.getErrorCode() == 2714)
+					{
+						// table exists
+						return 0;
+					}
+				} else if (databaseName.equals("Oracle"))
 				{
-					// table exists
-					return 0;
+					if (message.contains("ORA-00955")
+							|| message.contains("ORA-01031"))
+					{
+						// table exists
+						return 0;
+					}
 				}
 			}
 			throw e;
