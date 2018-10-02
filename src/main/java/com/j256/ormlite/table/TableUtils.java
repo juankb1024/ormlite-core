@@ -622,6 +622,9 @@ public class TableUtils
 		{
 			if (ifNotExists)
 			{
+				logger.debug(	"error creating table '{}'",
+								tableInfo.getTableName());
+				logger.debug(e, "ifnotexist true");
 				Throwable cause = e.getCause();
 				String message = cause.getMessage();
 				String databaseName = databaseType.getDatabaseName();
